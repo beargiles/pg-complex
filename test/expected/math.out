@@ -1,8 +1,8 @@
 \set ECHO None
-select 1::complex as a, 1.0::complex as b;
-   a   |   b   
--------+-------
- (1,0) | (1,0)
+select 1::complex as a, (1::int8)::complex as b, 1.0::complex as c;
+   a   |   b   |   c   
+-------+-------+-------
+ (1,0) | (1,0) | (1,0)
 (1 row)
 
 select (1,2)::complex as a, -(1,2)::complex as b, ~(1,2)::complex as c;

@@ -3,7 +3,7 @@ BEGIN;
 \i sql/pg_complex.sql
 \set ECHO all
 
-select 1::complex as a, 1.0::complex as b;
+select 1::complex as a, (1::int8)::complex as b, 1.0::complex as c;
 
 select (1,2)::complex as a, -(1,2)::complex as b, ~(1,2)::complex as c;
 

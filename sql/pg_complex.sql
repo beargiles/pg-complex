@@ -11,11 +11,11 @@ CREATE TYPE complex AS (re float8, im float8);
 --
 -- create functions implemented in SQL.
 --
-CREATE OR REPLACE FUNCTION pgx_complex_from_float8(float8) RETURNS complex AS $$
-   SELECT ROW($1, 0)::complex;
+CREATE OR REPLACE FUNCTION pgx_complex_from_int(int) RETURNS complex AS $$
+   SELECT ROW($1::float8, 0)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION pgx_complex_from_int(int) RETURNS complex AS $$
+CREATE OR REPLACE FUNCTION pgx_complex_from_bigint(bigint) RETURNS complex AS $$
    SELECT ROW($1::float8, 0)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
@@ -98,12 +98,12 @@ LANGUAGE C IMMUTABLE STRICT;
 --
 -- create casts
 --
-CREATE CAST (float8 AS complex)
-WITH FUNCTION pgx_complex_from_float8(float8)
-AS ASSIGNMENT;
-
 CREATE CAST (int AS complex)
 WITH FUNCTION pgx_complex_from_int(int)
+AS ASSIGNMENT;
+
+CREATE CAST (bigint AS complex)
+WITH FUNCTION pgx_complex_from_bigint(bigint)
 AS ASSIGNMENT;
 
 CREATE CAST (numeric AS complex)
