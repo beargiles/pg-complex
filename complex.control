@@ -1,5 +1,5 @@
-# pg_complex extension
+# complex extension
 comment = 'Complex number UDT'
 default_version = '0.0.1'
-module_pathname = '$libdir/pg_complex'
+module_pathname = '$libdir/complex'
 relocatable = true

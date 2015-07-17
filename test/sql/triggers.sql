@@ -1,6 +1,6 @@
 \set ECHO None
 BEGIN;
-\i sql/pg_complex.sql
+\i sql/complex.sql
 \set ECHO all
 
 -- do trigger

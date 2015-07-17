@@ -6,7 +6,7 @@
     "maintainer": "Bear Giles <bgiles@coyotesong.com>",
     "license": "postgresql",
     "provides": {
-        "pg_complex": {
+        "complex": {
             "abstract": "Complex number UDT",
             "file": "sql/pg_complex.sql",
             "docfile": "doc/pg_complex.md",
@@ -16,7 +16,8 @@
     "release_status": "unstable",
     "resources": {
         "repository": {
-          "url":  "git://github.com/bgiles/pg_complex/pg_complex.git",
+          "url":  "git://github.com/bgiles/pg_complex/complex.git",
+          "web":  "https://github.com/bgiles/pg_complex/complex",
           "type": "git"
         }
     },
