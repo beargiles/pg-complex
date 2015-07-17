@@ -1,4 +1,8 @@
 \set ECHO None
+\set c1 (1,2)::complex
+\set c2 (1,1)::complex
+\set c3 (3,4)::complex
+\set c4 (3,8)::complex
 select 1::complex as a, (1::int8)::complex as b, 1.0::complex as c;
    a   |   b   |   c   
 -------+-------+-------
@@ -11,106 +15,67 @@ select (1,2)::complex as a, -(1,2)::complex as b, ~(1,2)::complex as c;
  (1,2) | (-1,-2) | (1,-2)
 (1 row)
 
-select (1,2)::complex + (3,4)::complex as a,
-  3 + (1,2)::complex as b, (1,2)::complex + 3 as c;
+select :c1 + (3,4)::complex as a, 3 + :c1 as b, :c1 + 3 as c;
    a   |   b   |   c   
 -------+-------+-------
  (4,6) | (4,2) | (4,2)
 (1 row)
 
-select (1,2)::complex - (3,6)::complex as a,
-  3 - (1,2)::complex as b, (1,2)::complex - 3 as c;
+select :c1 - (3,6)::complex as a, 3 - :c1 as b, :c1 - 3 as c;
     a    |   b    |   c    
 ---------+--------+--------
  (-2,-4) | (2,-2) | (-2,2)
 (1 row)
 
-select (1,2)::complex * (3,5)::complex as a,
-  3 * (1,2)::complex as b, (1,2)::complex * 3 as c;
+select :c1 * (3,5)::complex as a, 3 * :c1 as b, :c1 * 3 as c;
     a    |   b   |   c   
 ---------+-------+-------
  (-7,11) | (3,6) | (3,6)
 (1 row)
 
-select (3,8)::complex / (1,2)::complex as c;
- c 
----
- 
+select :c1 * (3,5)::complex as a, 3.0::double precision * :c1 as b, :c1 * 3.0 as c;
+    a    |   b   |   c   
+---------+-------+-------
+ (-7,11) | (3,6) | (3,6)
 (1 row)
 
-select magnitude((1, 1)::complex) as magnitude;
+select :c4 / :c1  as a, (3.8, 0.4)::complex * :c1 = :c4 as b;
+     a     | b 
+-----------+---
+ (3.8,0.4) | t
+(1 row)
+
+select :c4 / (2,0)::complex as c;
+    c    
+---------
+ (1.5,4)
+(1 row)
+
+select :c4 / (0,2)::complex as c;
+    c     
+----------
+ (4,-1.5)
+(1 row)
+
+--
+-- check magnitude
+--
+select magnitude(:c1) as magnitude;
+    magnitude     
+------------------
+ 2.23606797749979
+(1 row)
+
+select magnitude(:c2) as magnitude;
+    magnitude    
+-----------------
+ 1.4142135623731
+(1 row)
+
+select magnitude(:c3) as magnitude;
  magnitude 
 -----------
-          
-(1 row)
-
---
--- check norm.
---
-select norm((1,0)::complex) as norm;
- norm 
-------
- 
-(1 row)
-
-select norm((0,1)::complex) as norm;
- norm 
-------
- 
-(1 row)
-
-select norm((-1, 0)::complex) as norm;
- norm 
-------
- 
-(1 row)
-
-select norm((0, -1)::complex) as norm;
- norm 
-------
- 
-(1 row)
-
-select norm((0, 0)::complex) as norm;
- norm 
-------
- 
-(1 row)
-
-select magnitude(norm((1, 1)::complex)) as magnitude;
- magnitude 
------------
-          
-(1 row)
-
---
--- test equality
---
-select (1,2)::complex = (1,2)::complex as b;
- b 
----
- 
-(1 row)
-
-select (1,2)::complex = (2,1)::complex as b;
- b 
----
- 
-(1 row)
-
---
--- test proximity
---
-select (1,2)::complex ~ (1,2)::complex as b;
- b 
----
- 
-(1 row)
-
-select (1,2)::complex ~ (2,1)::complex as b;
- b 
----
- 
+         5
 (1 row)
 
 ROLLBACK;
