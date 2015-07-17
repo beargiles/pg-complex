@@ -1,0 +1,8 @@
+\set ECHO None
+   
+--
+-- check aggregates
+--
+-- FIXME
+--
+ROLLBACK;
