@@ -23,6 +23,18 @@ CREATE OR REPLACE FUNCTION pgx_complex_from_numeric(numeric) RETURNS complex AS 
    SELECT ROW($1::float8, 0)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION pgx_complex_from_float8(float8) RETURNS complex AS $$
+   SELECT ROW($1, 0)::complex;
+$$ LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION pgx_complex_eq(complex, complex) RETURNS bool AS $$
+   SELECT $1.re = $2.re AND $1.im = $2.im;
+$$ LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION pgx_complex_ne(complex, complex) RETURNS bool AS $$
+   SELECT $1.re <> $2.re OR $1.im <> $2.im;
+$$ LANGUAGE SQL IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION pgx_complex_negate(complex) RETURNS complex AS $$
    SELECT ROW(-$1.re, -$1.im)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
@@ -35,11 +47,11 @@ CREATE OR REPLACE FUNCTION pgx_complex_add(complex, complex) RETURNS complex AS 
    SELECT ROW($1.re + $2.re, $1.im + $2.im)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION pgx_complex_add(numeric, complex) RETURNS complex AS $$
+CREATE OR REPLACE FUNCTION pgx_complex_add_f8(float8, complex) RETURNS complex AS $$
    SELECT ROW($1 + $2.re, $2.im)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION pgx_complex_add(complex, numeric) RETURNS complex AS $$
+CREATE OR REPLACE FUNCTION pgx_complex_add_f8(complex, float8) RETURNS complex AS $$
    SELECT ROW($1.re + $2, $1.im)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
@@ -47,11 +59,11 @@ CREATE OR REPLACE FUNCTION pgx_complex_subtract(complex, complex) RETURNS comple
    SELECT ROW($1.re - $2.re, $1.im - $2.im)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION pgx_complex_subtract(numeric, complex) RETURNS complex AS $$
+CREATE OR REPLACE FUNCTION pgx_complex_subtract_f8(float8, complex) RETURNS complex AS $$
    SELECT ROW($1 - $2.re, -$2.im)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION pgx_complex_subtract(complex, numeric) RETURNS complex AS $$
+CREATE OR REPLACE FUNCTION pgx_complex_subtract_f8(complex, float8) RETURNS complex AS $$
    SELECT ROW($1.re - $2, $1.im)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
@@ -59,22 +71,21 @@ CREATE OR REPLACE FUNCTION pgx_complex_multiply(complex, complex) RETURNS comple
    SELECT ROW($1.re * $2.re - $1.im * $2.im, $1.re * $2.im + $1.im * $2.re)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION pgx_complex_multiply(numeric, complex) RETURNS complex AS $$
+CREATE OR REPLACE FUNCTION pgx_complex_multiply_f8(float8, complex) RETURNS complex AS $$
    SELECT ROW($1 * $2.re, $1 * $2.im)::complex;
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION pgx_complex_multiply(complex, numeric) RETURNS complex AS $$
-   SELECT ROW($1.re * $2, $1.im * $2)::complex;
+CREATE OR REPLACE FUNCTION pgx_complex_multiply_f8(complex, float8) RETURNS complex AS $$
+   SELECT pgx_complex_multiply_f8($2, $1);
+$$ LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION magnitude(complex) RETURNS float8 AS $$
+   SELECT sqrt($1.re * $1.re + $1.im * $1.im);
 $$ LANGUAGE SQL IMMUTABLE STRICT;
 
 --
 -- create functions implemented in C.
 --
-CREATE OR REPLACE FUNCTION pgx_complex_eq(complex, complex)
-RETURNS bool
-AS 'pg_complex', 'pgx_complex_eq'
-LANGUAGE C IMMUTABLE STRICT;
-
 CREATE OR REPLACE FUNCTION pgx_complex_near(complex, complex)
 RETURNS bool
 AS 'pg_complex', 'pgx_complex_near'
@@ -83,11 +94,6 @@ LANGUAGE C IMMUTABLE STRICT;
 CREATE OR REPLACE FUNCTION pgx_complex_divide(complex, complex)
 RETURNS complex
 AS 'pg_complex', 'pgx_complex_divide'
-LANGUAGE C IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION magnitude(complex)
-RETURNS float8
-AS 'pg_complex', 'pgx_complex_magnitude'
 LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION norm(complex)
@@ -110,6 +116,10 @@ CREATE CAST (numeric AS complex)
 WITH FUNCTION pgx_complex_from_numeric(numeric)
 AS ASSIGNMENT;
 
+CREATE CAST (float8 AS complex)
+WITH FUNCTION pgx_complex_from_float8(float8)
+AS ASSIGNMENT;
+
 --
 -- create operators
 --
@@ -122,7 +132,16 @@ CREATE OPERATOR = (
    MERGES
 );
 
-CREATE OPERATOR ~ (
+CREATE OPERATOR <> (
+   LEFTARG = complex,
+   RIGHTARG = complex,
+   PROCEDURE = pgx_complex_ne,
+   NEGATOR = =,
+   HASHES,
+   MERGES
+);
+
+CREATE OPERATOR ~= (
    LEFTARG = complex,
    RIGHTARG = complex,
    PROCEDURE = pgx_complex_near
@@ -145,15 +164,17 @@ CREATE OPERATOR + (
 );
 
 CREATE OPERATOR + (
-   LEFTARG = numeric,
+   LEFTARG = float8,
    RIGHTARG = complex,
-   PROCEDURE = pgx_complex_add
+   PROCEDURE = pgx_complex_add_f8,
+   COMMUTATOR = +
 );
 
 CREATE OPERATOR + (
    LEFTARG = complex,
-   RIGHTARG = numeric,
-   PROCEDURE = pgx_complex_add
+   RIGHTARG = float8,
+   PROCEDURE = pgx_complex_add_f8,
+   COMMUTATOR = +
 );
 
 CREATE OPERATOR - (
@@ -163,15 +184,15 @@ CREATE OPERATOR - (
 );
 
 CREATE OPERATOR - (
-   LEFTARG = numeric,
+   LEFTARG = float8,
    RIGHTARG = complex,
-   PROCEDURE = pgx_complex_subtract
+   PROCEDURE = pgx_complex_subtract_f8
 );
 
 CREATE OPERATOR - (
    LEFTARG = complex,
-   RIGHTARG = numeric,
-   PROCEDURE = pgx_complex_subtract
+   RIGHTARG = float8,
+   PROCEDURE = pgx_complex_subtract_f8
 );
 
 CREATE OPERATOR * (
@@ -181,15 +202,17 @@ CREATE OPERATOR * (
 );
 
 CREATE OPERATOR * (
-   LEFTARG = numeric,
+   LEFTARG = float8,
    RIGHTARG = complex,
-   PROCEDURE = pgx_complex_multiply
+   PROCEDURE = pgx_complex_multiply_f8,
+   COMMUTATOR = *
 );
 
 CREATE OPERATOR * (
    LEFTARG = complex,
-   RIGHTARG = numeric,
-   PROCEDURE = pgx_complex_multiply
+   RIGHTARG = float8,
+   PROCEDURE = pgx_complex_multiply_f8,
+   COMMUTATOR = *
 );
 
 CREATE OPERATOR / (
