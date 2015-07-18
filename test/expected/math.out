@@ -39,22 +39,34 @@ select :c1 * (3,5)::complex as a, 3.0::double precision * :c1 as b, :c1 * 3.0 as
  (-7,11) | (3,6) | (3,6)
 (1 row)
 
-select :c4 / :c1  as a, (3.8, 0.4)::complex * :c1 = :c4 as b;
+select :c4 / :c1  as a, (:c4 / :c1) * :c1 = :c4 as b;
      a     | b 
 -----------+---
  (3.8,0.4) | t
 (1 row)
 
-select :c4 / (2,0)::complex as c;
-    c    
----------
- (1.5,4)
+select :c4 / (2,0)::complex as a, (2,0)::complex * (:c4 / (2,0)::complex) = :c4 as b;
+    a    | b 
+---------+---
+ (1.5,4) | t
 (1 row)
 
-select :c4 / (0,2)::complex as c;
-    c     
-----------
- (4,-1.5)
+select :c4 / (0,2)::complex as a, (0,2)::complex * (:c4 / (0,2)::complex) = :c4 as b;
+    a     | b 
+----------+---
+ (4,-1.5) | t
+(1 row)
+
+select :c4 / 3 as a, 3 * (:c4 / 3) = :c4 as b;
+          a           | b 
+----------------------+---
+ (1,2.66666666666667) | t
+(1 row)
+
+select 3 / :c4 as a, :c4 * (3 / :c4) = (3,0)::complex as b;
+                   a                    | b 
+----------------------------------------+---
+ (0.123287671232877,-0.328767123287671) | t
 (1 row)
 
 --

@@ -19,9 +19,11 @@ select :c1 - (3,6)::complex as a, 3 - :c1 as b, :c1 - 3 as c;
 select :c1 * (3,5)::complex as a, 3 * :c1 as b, :c1 * 3 as c;
 select :c1 * (3,5)::complex as a, 3.0::double precision * :c1 as b, :c1 * 3.0 as c;
 
-select :c4 / :c1  as a, (3.8, 0.4)::complex * :c1 = :c4 as b;
-select :c4 / (2,0)::complex as c;
-select :c4 / (0,2)::complex as c;
+select :c4 / :c1  as a, (:c4 / :c1) * :c1 = :c4 as b;
+select :c4 / (2,0)::complex as a, (2,0)::complex * (:c4 / (2,0)::complex) = :c4 as b;
+select :c4 / (0,2)::complex as a, (0,2)::complex * (:c4 / (0,2)::complex) = :c4 as b;
+select :c4 / 3 as a, 3 * (:c4 / 3) = :c4 as b;
+select 3 / :c4 as a, :c4 * (3 / :c4) = (3,0)::complex as b;
 
 --
 -- check magnitude
