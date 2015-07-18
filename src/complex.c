@@ -17,18 +17,16 @@ Datum
 pgx_complex_near(PG_FUNCTION_ARGS) {
     double re[2];
     double im[2];
-    int i;
-    double dr, di;
     double p, q;
+    int i;
 
     // unwrap values.    
     for (i = 0; i < 2; i++) {
         HeapTupleHeader t = PG_GETARG_HEAPTUPLEHEADER(i);
         bool isnull[2];
-        Datum dr, di;
 
-        dr = GetAttributeByName(t, "re", &isnull[0]);
-        di = GetAttributeByName(t, "im", &isnull[1]);
+        Datum dr = GetAttributeByName(t, "re", &isnull[0]);
+        Datum di = GetAttributeByName(t, "im", &isnull[1]);
 
         // STRICT prevents the 'complex' value from being null but does
         // not prevent its components from being null.        
@@ -40,17 +38,17 @@ pgx_complex_near(PG_FUNCTION_ARGS) {
         im[i] = DatumGetFloat8(di);
     }
 
-    // the numerator is the square of the magnitude of the difference between the points    
-    dr = re[0] - re[1];
-    di = im[0] - im[1];
-    p = dr * dr + di * di;
-
-    // the denominator is the square of the magnitude of the sum of the points.
-    q = re[0] * re[1] + im[0] * im[1];
-      
+    // compute distance between points, distance of points from origin.
+    p = hypot(re[0] - re[1], im[0] - im[1]);
+    q = max(hypot(re[0], im[0]), hypot(re[1], im[1]));
+    
+    if (q == 0) {
+        PG_RETURN_BOOL(1);
+    }
+    
     // we consider the points 'near' each other if the distance between them is small
     // relative to the size of them. 
-    PG_RETURN_BOOL(p / q < 1e-12); 
+    PG_RETURN_BOOL(p / q < 1e-8); 
 }
 
 /*
@@ -98,9 +96,9 @@ pgx_complex_divide(PG_FUNCTION_ARGS) {
     }
 
     // the denominator is the square of the magnitude of the divisor.
-    q = re[1] * re[1] + im[1] * im[1];
+    q = hypot(re[1], im[1]);
     
-    // FIXME
+    // should I throw error instead of returning null?
     if (q == 0.0) {
         PG_RETURN_NULL();
     }
@@ -151,9 +149,9 @@ pgx_complex_norm(PG_FUNCTION_ARGS) {
     re = DatumGetFloat8(datum[0]);
     im = DatumGetFloat8(datum[1]);
 
-    m = sqrt(re * re + im * im);
+    m = hypot(re, im);
    
-    // FIXME 
+    // should I throw error instead of returning null?
     if (m == 0.0) {
         PG_RETURN_NULL();
     } 
