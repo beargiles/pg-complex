@@ -91,10 +91,22 @@ RETURNS bool
 AS 'pg_complex', 'pgx_complex_near'
 LANGUAGE C IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION pgx_complex_not_near(complex, complex) RETURNS bool AS $$
+   SELECT NOT pgx_complex_near($1, $2);
+$$ LANGUAGE SQL IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION pgx_complex_divide(complex, complex)
 RETURNS complex
 AS 'pg_complex', 'pgx_complex_divide'
 LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION pgx_complex_divide_f8(complex, float8) RETURNS complex AS $$
+   SELECT ROW($1.re/$2, $1.im/$2)::complex;
+$$ LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION pgx_complex_divide_f8(float8, complex) RETURNS complex AS $$
+   SELECT pgx_complex_divide(ROW($1,0)::complex, $2);
+$$ LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION norm(complex)
 RETURNS complex
@@ -145,6 +157,12 @@ CREATE OPERATOR ~= (
    LEFTARG = complex,
    RIGHTARG = complex,
    PROCEDURE = pgx_complex_near
+);
+
+CREATE OPERATOR ~<> (
+   LEFTARG = complex,
+   RIGHTARG = complex,
+   PROCEDURE = pgx_complex_not_near
 );
 
 CREATE OPERATOR - (
@@ -219,4 +237,16 @@ CREATE OPERATOR / (
    LEFTARG = complex,
    RIGHTARG = complex,
    PROCEDURE = pgx_complex_divide
+);
+
+CREATE OPERATOR / (
+   LEFTARG = complex,
+   RIGHTARG = float8,
+   PROCEDURE = pgx_complex_divide_f8
+);
+
+CREATE OPERATOR / (
+   LEFTARG = float8,
+   RIGHTARG = complex,
+   PROCEDURE = pgx_complex_divide_f8
 );
