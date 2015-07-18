@@ -1,22 +1,28 @@
 {
-    "name": "pg_complex",
+    "name": "complex",
     "abstract": "Complex number UDT",
     "description": "C-language extension that provides a UDT for complex numbers. It is intended for educational purposes, not production use.",
     "version": "0.0.1",
     "maintainer": "Bear Giles <bgiles@coyotesong.com>",
-    "license": "postgresql",
+    
+    "license": {
+       "PostgreSQL", "http://www.postgresql.org/about/license"
+    },
+    
     "provides": {
         "complex": {
             "abstract": "Complex number UDT",
-            "file": "sql/pg_complex.sql",
-            "docfile": "doc/pg_complex.md",
+            "file": "sql/complex.sql",
+            "docfile": "doc/complex.md",
             "version": "0.0.1"
         }
     },
+    
     "release_status": "unstable",
+    
     "resources": {
         "repository": {
-          "url":  "git://github.com/bgiles/pg_complex/complex.git",
+          "url":  "https://github.com/bgiles/pg_complex/complex.git",
           "web":  "https://github.com/bgiles/pg_complex/complex",
           "type": "git"
         }
@@ -24,9 +30,17 @@
 
     "generated_by": "Bear Giles <bgiles@coyotesong.com>",
 
-
     "meta-spec": {
         "version": "1.0.0",
         "url": "http://pgxn.org/meta/spec.txt"
-    }
+    },
+    
+    "tags": [
+       "math",
+       "complex number",
+       "educational",
+       "example",
+       "user-defined type",
+       "UDT"
+    ]   
 }
