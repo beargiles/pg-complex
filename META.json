@@ -2,7 +2,7 @@
     "name": "complex",
     "abstract": "Complex number UDT",
     "description": "C-language extension that provides a UDT for complex numbers. It is intended for educational purposes, not production use.",
-    "version": "0.0.1",
+    "version": "0.4.0",
     "maintainer": "Bear Giles <bgiles@coyotesong.com>",
     
     "license": "postgresql",
@@ -12,7 +12,7 @@
             "abstract": "Complex number UDT",
             "file": "sql/complex.sql",
             "docfile": "doc/complex.md",
-            "version": "0.0.1"
+            "version": "0.4.0"
         }
     },
     
