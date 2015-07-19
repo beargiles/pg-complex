@@ -40,7 +40,7 @@ pgx_complex_near(PG_FUNCTION_ARGS) {
 
     // compute distance between points, distance of points from origin.
     p = hypot(re[0] - re[1], im[0] - im[1]);
-    q = max(hypot(re[0], im[0]), hypot(re[1], im[1]));
+    q = hypot(re[0], im[0]) + hypot(re[1], im[1]);
     
     if (q == 0) {
         PG_RETURN_BOOL(1);
@@ -96,7 +96,7 @@ pgx_complex_divide(PG_FUNCTION_ARGS) {
     }
 
     // the denominator is the square of the magnitude of the divisor.
-    q = hypot(re[1], im[1]);
+    q = re[1] * re[1] + im[1] * im[1];
     
     // should I throw error instead of returning null?
     if (q == 0.0) {

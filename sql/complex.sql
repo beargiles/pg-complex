@@ -88,7 +88,7 @@ $$ LANGUAGE SQL IMMUTABLE STRICT;
 --
 CREATE OR REPLACE FUNCTION pgx_complex_near(complex, complex)
 RETURNS bool
-AS 'pg_complex', 'pgx_complex_near'
+AS 'complex', 'pgx_complex_near'
 LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION pgx_complex_not_near(complex, complex) RETURNS bool AS $$
@@ -97,7 +97,7 @@ $$ LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION pgx_complex_divide(complex, complex)
 RETURNS complex
-AS 'pg_complex', 'pgx_complex_divide'
+AS 'complex', 'pgx_complex_divide'
 LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION pgx_complex_divide_f8(complex, float8) RETURNS complex AS $$
@@ -110,7 +110,7 @@ $$ LANGUAGE SQL IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION norm(complex)
 RETURNS complex
-AS 'pg_complex', 'pgx_complex_norm'
+AS 'complex', 'pgx_complex_norm'
 LANGUAGE C IMMUTABLE STRICT;
 
 --
