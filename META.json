@@ -5,9 +5,7 @@
     "version": "0.0.1",
     "maintainer": "Bear Giles <bgiles@coyotesong.com>",
     
-    "license": {
-       "PostgreSQL", "http://www.postgresql.org/about/license"
-    },
+    "license": "postgresql",
     
     "provides": {
         "complex": {
