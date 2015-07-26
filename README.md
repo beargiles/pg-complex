@@ -10,6 +10,10 @@ database?)
 
 The UDT demonstrates the use of composite types.
 
+A discussion of the creation and use of this extension can be
+found at http://invariantproperties.com/2015/07/17/extending-postgresql-complex-number-data-type/.
+
+
 Installation
 ------------
 
