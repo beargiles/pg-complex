@@ -3,6 +3,29 @@
 --
 -- check aggregates
 --
--- FIXME
---
+CREATE TABLE t (
+   id serial,
+   c complex
+);
+SELECT sum(c), avg(c) FROM t;
+  sum  | avg 
+-------+-----
+ (0,0) | 
+(1 row)
+
+INSERT INTO t VALUES (1, (1,3)::complex);
+SELECT sum(c), avg(c) FROM t;
+  sum  |  avg  
+-------+-------
+ (1,3) | (1,3)
+(1 row)
+
+INSERT INTO t VALUES (2, (2,5)::complex), (3, (3,7)::complex);
+SELECT sum(c), avg(c) FROM t;
+  sum   |  avg  
+--------+-------
+ (6,15) | (2,5)
+(1 row)
+
+-- SELECT sum(c) OVER (ORDER BY id), avg(c) OVER (ORDER BY id) FROM t;
 ROLLBACK;

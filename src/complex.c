@@ -164,4 +164,3 @@ pgx_complex_norm(PG_FUNCTION_ARGS) {
  
     PG_RETURN_DATUM(HeapTupleGetDatum(tuple));
 }
-
